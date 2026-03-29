@@ -75,9 +75,9 @@ elif [ "$count" -gt 1 ]; then
     uci set network.wan.proto='dhcp'
 
     # 配置WAN6
-    uci set network.wan6=interface
-    uci set network.wan6.device="$wan_ifname"
-    uci set network.wan6.proto='dhcpv6'
+    #uci set network.wan6=interface
+    #uci set network.wan6.device="$wan_ifname"
+    #uci set network.wan6.proto='dhcpv6'
 
     # 查找 br-lan 设备 section
     section=$(uci show network | awk -F '[.=]' '/\.@?device\[\d+\]\.name=.br-lan.$/ {print $2; exit}')
@@ -105,8 +105,8 @@ elif [ "$count" -gt 1 ]; then
         uci set network.lan.ipaddr=$CUSTOM_IP
         echo "custom router ip is $CUSTOM_IP" >> $LOGFILE
     else
-        uci set network.lan.ipaddr='192.168.100.1'
-        echo "default router ip is 192.168.100.1" >> $LOGFILE
+        uci set network.lan.ipaddr='192.168.8.1'
+        echo "default router ip is 192.168.8.1" >> $LOGFILE
     fi
 
     # PPPoE设置
