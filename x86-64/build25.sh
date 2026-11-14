@@ -42,9 +42,15 @@ PACKAGES="$PACKAGES luci-i18n-argon-config-zh-cn"
 #25.12
 PACKAGES="$PACKAGES luci-i18n-package-manager-zh-cn"
 PACKAGES="$PACKAGES luci-i18n-ttyd-zh-cn"
-PACKAGES="$PACKAGES luci-app-openclash"
 PACKAGES="$PACKAGES openssh-sftp-server"
-PACKAGES="$PACKAGES luci-i18n-vlmcsd-zh-cn"
+
+# ============= 自定义第三方软件（x86-64 / 25.12 apk 源内直接可装）=============
+# 1) OpenClash 代理：clash_meta 内核 + GeoIP/GeoSite 由本文件下方逻辑自动下载进 overlay
+PACKAGES="$PACKAGES luci-app-openclash"
+# 2) AdGuard Home 去广告 DNS：adguardhome 是服务本体，luci-app-adguardhome 是界面（自带中文）
+PACKAGES="$PACKAGES adguardhome luci-app-adguardhome"
+# 3) vlmcsd KMS 激活服务：vlmcsd 服务本体 + luci-app-vlmcsd 界面 + 中文语言包
+PACKAGES="$PACKAGES vlmcsd luci-app-vlmcsd luci-i18n-vlmcsd-zh-cn"
 
 # 文件管理器
 PACKAGES="$PACKAGES luci-i18n-filemanager-zh-cn"
@@ -70,13 +76,10 @@ if echo "$PACKAGES" | grep -q "luci-app-openclash"; then
     # Download GeoIP and GeoSite
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O files/etc/openclash/GeoIP.dat
     wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O files/etc/openclash/GeoSite.dat
-    # Download latest openclash Client
-    URL=$(curl -s https://api.github.com/repos/vernesong/OpenClash/releases/latest \
-      | grep "browser_download_url.*apk" \
-      | head -n1 \
-      | cut -d '"' -f 4)
-    echo "OpenClash latest apk: $URL"
-    wget "$URL" -P /home/build/immortalwrt/packages/
+    # 客户端本体 luci-app-openclash 直接使用 ImmortalWrt 25.12.x 官方 apk 源
+    # （25.12.2 源内为 0.48.002，已签名），不再从 GitHub Releases 抓最新 apk：
+    # 好处是构建可复现，也不会因第三方 apk 的签名/打包方式变化而导致 make image 失败。
+    # 这里只刷新运行内核与 GeoIP/GeoSite 数据。
 else
     echo "⚪️ 未选择 luci-app-openclash"
 fi
